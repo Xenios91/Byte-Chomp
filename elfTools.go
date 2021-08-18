@@ -7,6 +7,7 @@ import (
 
 var elfFile *ElfFile
 
+//ElfFile a struct representing all of the information contained within an ELF binary object
 type ElfFile struct {
 	file       *os.File
 	fileHeader *elf.FileHeader
