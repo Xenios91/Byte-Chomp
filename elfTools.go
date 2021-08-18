@@ -21,7 +21,7 @@ func NewElfFile(file *elf.File, projectName string) *ElfFile {
 	return elfFile
 }
 
-//GenerateCSV() generates a csv of ELF file information
+//GenerateCSV generates a csv of ELF file information
 func (elfFile *ElfFile) GenerateCSV() {
 	if len(elfFile.sectionData) == 0 {
 		elfFile.StartAnalysis()
