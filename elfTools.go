@@ -41,11 +41,11 @@ func (elfFile *ElfFile) StartAnalysis() error {
 
 func (elfFile *ElfFile) loadSectionData(sectionType sectionOfInterest) error {
 	section := elfFile.file.Section(string(sectionType))
-	if data, err := section.Data(); err != nil {
+	data, err := section.Data()
+	if err != nil {
 		return err
-	} else {
-		elfFile.sectionData[sectionType] = data
 	}
+	elfFile.sectionData[sectionType] = data
 	return nil
 }
 
