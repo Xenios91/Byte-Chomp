@@ -2,9 +2,6 @@ package bytechomp
 
 import (
 	"debug/elf"
-	"encoding/base64"
-	"encoding/csv"
-	"os"
 )
 
 var (
@@ -14,13 +11,23 @@ var (
 //ElfFile a struct representing all of the information contained within an ELF binary object
 type ElfFile struct {
 	file        *elf.File
+	projectName string
 	sectionData map[sectionOfInterest][]byte
 }
 
 //NewElfFile creates a new ElfFile struct, should be used instead of new
-func NewElfFile(file *elf.File) *ElfFile {
-	elfFile = &ElfFile{file, make(map[sectionOfInterest][]byte)}
+func NewElfFile(file *elf.File, projectName string) *ElfFile {
+	elfFile = &ElfFile{file, projectName, make(map[sectionOfInterest][]byte)}
 	return elfFile
+}
+
+//GenerateCSV() generates a csv of ELF file information
+func (elfFile *ElfFile) GenerateCSV() {
+	if len(elfFile.sectionData) == 0 {
+		elfFile.StartAnalysis()
+	}
+	csvData := MakeCsvData(elfFile)
+	csvData.CreateCSV()
 }
 
 //StartAnalysis starts analysis on an ELF binary, returns an error if a problem occurs
@@ -50,29 +57,4 @@ func (elfFile *ElfFile) loadSections() error {
 		}
 	}
 	return nil
-}
-
-func (elfFile *ElfFile) getBase64() map[string]*string {
-	var base64Map = make(map[string]*string, len(elfFile.sectionData))
-	for key, value := range elfFile.sectionData {
-		encodedString := base64.StdEncoding.EncodeToString(value)
-		base64Map[string(key)] = &encodedString
-	}
-	return base64Map
-}
-
-func (elfFile *ElfFile) CreateCSV() (fileName string, err error) {
-	file, err := os.Create("result.csv")
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-
-	for _, value := range data {
-		err := writer.Write(value)
-		checkError("Cannot write to file", err)
-	}
 }
