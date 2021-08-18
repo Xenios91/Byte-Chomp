@@ -32,7 +32,7 @@ func (csvData *CsvData) getBase64() map[string]*string {
 
 func (csvData *CsvData) getCSVSectionHeaders() []string {
 	var headers = make([]string, len(elfFile.sectionData))
-	var counter int = 0
+	var counter = 0
 
 	for key := range elfFile.sectionData {
 		headers[counter] = string(key)
