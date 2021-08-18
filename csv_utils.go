@@ -7,12 +7,14 @@ import (
 	"os"
 )
 
+//CsvData a struct representing the data to be exported to a csv file
 type CsvData struct {
 	fileName string
 	headers  []string
 	rows     []string
 }
 
+//MakeCsvData creates a new CsvData struct and fills out some of its attributes based on the elfFile struct passed to it
 func MakeCsvData(elfFile *ElfFile) *CsvData {
 	size := len(elfFile.sectionData)
 	csvData := &CsvData{elfFile.projectName, make([]string, size), make([]string, size)}
@@ -51,6 +53,7 @@ func (csvData *CsvData) getRows() []string {
 	return data
 }
 
+//CreateCSV creates a new csv file from the CsvData struct that calls this method
 func (csvData *CsvData) CreateCSV() (fileName string, err error) {
 	fileName = fmt.Sprintf("%s.csv", csvData.fileName)
 	file, err := os.Create(fileName)
