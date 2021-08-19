@@ -2,6 +2,7 @@ package bytechomp
 
 import (
 	"debug/elf"
+	"errors"
 )
 
 var (
@@ -16,25 +17,38 @@ type ElfFile struct {
 }
 
 //NewElfFile creates a new ElfFile struct, should be used instead of new
-func NewElfFile(file *elf.File, projectName string) *ElfFile {
+func NewElfFile(file *elf.File, projectName string) (*ElfFile, error) {
+	if file == nil {
+		return nil, errors.New("elf file cannot be nil")
+	}
 	elfFile = &ElfFile{file, projectName, make(map[sectionOfInterest][]byte)}
-	return elfFile
+	return elfFile, nil
+}
+
+func (elfFile *ElfFile) validateElfFile() error {
+	if elfFile.file == nil {
+		return errors.New("invalid elf file")
+	}
+	return nil
 }
 
 //GenerateCSV generates a csv of ELF file information
-func (elfFile *ElfFile) GenerateCSV() {
+func (elfFile *ElfFile) GenerateCSV() (fileName string, err error) {
 	if len(elfFile.sectionData) == 0 {
 		elfFile.StartAnalysis()
 	}
 	csvData := MakeCsvData(elfFile)
-	csvData.CreateCSV()
+	fileName, err = csvData.CreateCSV()
+	return fileName, err
 }
 
 //StartAnalysis starts analysis on an ELF binary, returns an error if a problem occurs
 func (elfFile *ElfFile) StartAnalysis() error {
-	err := elfFile.loadSections()
-	if err != nil {
-		return err
+	if err := elfFile.validateElfFile(); err != nil {
+		return errors.New("elf file failed validations")
+	}
+	if err := elfFile.loadSections(); err != nil {
+		return errors.New("sections of the elf file could not be loaded")
 	}
 	return nil
 }
@@ -50,11 +64,12 @@ func (elfFile *ElfFile) loadSectionData(sectionType sectionOfInterest) error {
 }
 
 func (elfFile *ElfFile) loadSections() error {
+	var err error
 	for _, section := range sectionsOfInterest {
-		err := elfFile.loadSectionData(section)
+		err = elfFile.loadSectionData(section)
 		if err != nil {
-			return err
+			break
 		}
 	}
-	return nil
+	return err
 }
