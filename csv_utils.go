@@ -44,7 +44,7 @@ func (csvData *CsvData) getCSVSectionHeaders() []string {
 func (csvData *CsvData) getRows() []string {
 	var data = make([]string, len(elfFile.sectionData))
 	base64Data := csvData.getBase64()
-	var counter int = 0
+	var counter int
 
 	for _, value := range csvData.headers {
 		data[counter] = *base64Data[value]
