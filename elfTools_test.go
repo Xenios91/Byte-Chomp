@@ -45,7 +45,7 @@ func TestNewElfFile(t *testing.T) {
 		t.FailNow()
 	}
 
-	var fileDoesntExist *elf.File = nil
+	var fileDoesntExist *elf.File
 	_, err = NewElfFile(fileDoesntExist, "testBadProject")
 	if err == nil {
 		t.FailNow()
